@@ -6,7 +6,7 @@ import pickle
 st.set_page_config(page_title="Real Estate Price Prediction", layout="centered")
 
 # Load the pre-trained model
-model_path = 'C:/Users/HomePC/Documents/Data Science/Projects/End-to-End ML Model/real_estate_model.pkl'
+model_path = './real_estate_model.pkl'
 with open(model_path, 'rb') as file:
     model = pickle.load(file)
 
