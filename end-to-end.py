@@ -18,40 +18,55 @@ st.markdown("""
         background-size: cover;
         background-attachment: fixed;
     }
-
     .block-container {
         background-color: rgba(0, 0, 0, 0.9);
         padding: 2rem;
         border-radius: 10px;
         max-width: 600px;
-        margin: 200px auto;
+        margin: 150px auto;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# App title
-st.title("🏠 Real Estate Price Prediction")
-st.markdown("Enter the property details below to predict the **house price per unit area.**")
+# Initialize session state
+if "form_visible" not in st.session_state:
+    st.session_state.form_visible = False
 
-# Input form
-with st.form(key='prediction_form'):
-    distance_to_mrt = st.number_input("Distance to the nearest MRT station (in meters)", min_value=0.0, step=10.0)
-    num_convenience_stores = st.number_input("Number of convenience stores", min_value=0)
-    latitude = st.number_input("Latitude", min_value=-90.0, max_value=90.0)
-    longitude = st.number_input("Longitude", min_value=-180.0, max_value=180.0)
+# Landing Page
+if not st.session_state.form_visible:
+    st.title("🏠 Real Estate Price Prediction")
+    st.markdown("""
+        Welcome to the Real Estate Price Predictor!  
+        This tool estimates the **house price per unit area** using key features like proximity to MRT stations, number of nearby convenience stores, and location coordinates.
 
-    
-    submit = st.form_submit_button(label='Predict Price')
+        ### ✨ How it works:
+        - Input the property details.
+        - The model will return the predicted price instantly.
+        
+        Click the button below to get started.
+    """)
+    if st.button("🚀 Get Started"):
+        st.session_state.form_visible = True
+        st.experimental_rerun()
 
-# Prediction
-if submit:
-    if None not in [distance_to_mrt, num_convenience_stores, latitude, longitude]:
-        with st.spinner("Predicting..."):
-            features = pd.DataFrame([[distance_to_mrt, num_convenience_stores, latitude, longitude]],
-                columns=['Distance to the nearest MRT station', 'Number of convenience stores', 'Latitude', 'Longitude'])
+# Prediction Form
+if st.session_state.form_visible:
+    st.title("🔍 Enter Property Details")
 
-            prediction = model.predict(features)[0]
+    with st.form(key='prediction_form'):
+        distance_to_mrt = st.number_input("Distance to the nearest MRT station (in meters)", min_value=0.0, step=10.0)
+        num_convenience_stores = st.number_input("Number of convenience stores", min_value=0)
+        latitude = st.number_input("Latitude", format="%.6f")
+        longitude = st.number_input("Longitude", format="%.6f")
+
+        submit = st.form_submit_button(label='Predict Price')
+
+    if submit:
+        if None not in [distance_to_mrt, num_convenience_stores, latitude, longitude]:
+            with st.spinner("Predicting..."):
+                features = pd.DataFrame([[distance_to_mrt, num_convenience_stores, latitude, longitude]],
+                                        columns=['Distance to the nearest MRT station', 'Number of convenience stores', 'Latitude', 'Longitude'])
+                prediction = model.predict(features)[0]
             st.success(f"💰 Predicted House Price: {prediction:.2f} per unit area")
-    else:
-        st.warning("Please fill in all input fields.")
-
+        else:
+            st.warning("Please fill in all input fields.")
