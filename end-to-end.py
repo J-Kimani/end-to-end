@@ -47,7 +47,7 @@ if not st.session_state.form_visible:
     """)
     if st.button("🚀 Get Started"):
         st.session_state.form_visible = True
-        st.experimental_rerun()
+        
 
 # Prediction Form
 if st.session_state.form_visible:
